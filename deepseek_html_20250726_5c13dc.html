@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIKI - Plateforme de Jeux</title>
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* Variables CSS */
+        :root {
+            --primary: #6c5ce7;
+            --primary-light: #a29bfe;
+            --primary-dark: #5649c0;
+            --secondary: #fd79a8;
+            --dark: #2d3436;
+            --dark-light: #636e72;
+            --light: #f5f6fa;
+            --light-dark: #dfe6e9;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #d63031;
+            --info: #0984e3;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+            
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* Base Styles */
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Navigation */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            background: white;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--primary);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .search-container {
+            position: relative;
+            width: 40%;
+            max-width: 500px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 0.75rem 1.25rem;
+            padding-right: 3rem;
+            border-radius: var(--radius-full);
+            border: 2px solid var(--light-dark);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background-color: var(--light);
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--dark-light);
+            cursor: pointer;
+        }
+
+        /* Language Selector */
+        .language-selector {
+            position: relative;
+        }
+
+        .language-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--light);
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .language-btn:hover {
+            background: var(--light-dark);
+        }
+
+        .language-menu {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            background: white;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            padding: 0.5rem 0;
+            width: 180px;
+            z-index: 10;
+            display: none;
+        }
+
+        .language-menu.show {
+            display: block;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .language-option {
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .language-option:hover {
+            background: var(--light);
+        }
+
+        .language-flag {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        /* Games Grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .game-thumbnail {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(45deg, var(--light), var(--light-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-light);
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-thumbnail::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.1), transparent);
+        }
+
+        .game-info {
+            padding: 1.25rem;
+        }
+
+        .game-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .game-category {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary-light);
+            color: white;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: var(--dark-light);
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--light-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark-light);
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            color: var(--danger);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--light-dark);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        /* Game Viewer */
+        .game-viewer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 1000;
+        }
+
+        .game-viewer.show {
+            display: block;
+        }
+
+        .game-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .close-game-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            background: white;
+            box-shadow: var(--shadow-xl);
+            z-index: 1001;
+            overflow-y: auto;
+        }
+
+        .settings-panel.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .settings-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--light-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .settings-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .settings-body {
+            padding: 1.5rem;
+        }
+
+        .settings-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--light-dark);
+            color: var(--primary);
+        }
+
+        /* Stats Table */
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .stats-table th, .stats-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--light-dark);
+        }
+
+        .stats-table th {
+            background: var(--light);
+            font-weight: 600;
+        }
+
+        .stats-table tr:hover {
+            background: var(--light);
+        }
+
+        /* Search History */
+        .search-history {
+            list-style: none;
+        }
+
+        .search-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--light-dark);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .search-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--dark-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+
+            .games-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+
+            .settings-panel {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        .game-card {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Delay animations for grid items */
+        .game-card:nth-child(1) { animation-delay: 0.1s; }
+        .game-card:nth-child(2) { animation-delay: 0.2s; }
+        .game-card:nth-child(3) { animation-delay: 0.3s; }
+        .game-card:nth-child(4) { animation-delay: 0.4s; }
+        .game-card:nth-child(5) { animation-delay: 0.5s; }
+        .game-card:nth-child(6) { animation-delay: 0.6s; }
+        .game-card:nth-child(7) { animation-delay: 0.7s; }
+        .game-card:nth-child(8) { animation-delay: 0.8s; }
+        .game-card:nth-child(9) { animation-delay: 0.9s; }
+        .game-card:nth-child(10) { animation-delay: 1s; }
+    </style>
+</head>
+<body>
+    <!-- Barre de navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">M</div>
+            <span>MIKI</span>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" class="search-bar" id="search-bar" placeholder="Rechercher des jeux...">
+            <button class="search-btn" id="search-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="language-selector">
+            <button class="language-btn" id="language-btn">
+                <span id="current-language">FR</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </button>
+            <div class="language-menu" id="language-menu">
+                <div class="language-option" data-lang="en">
+                    <img src="https://flagcdn.com/w20/gb.png" class="language-flag">
+                    <span>English</span>
+                </div>
+                <div class="language-option" data-lang="fr">
+                    <img src="https://flagcdn.com/w20/fr.png" class="language-flag">
+                    <span>Français</span>
+                </div>
+                <div class="language-option" data-lang="es">
+                    <img src="https://flagcdn.com/w20/es.png" class="language-flag">
+                    <span>Español</span>
+                </div>
+                <div class="language-option" data-lang="ar">
+                    <img src="https://flagcdn.com/w20/sa.png" class="language-flag">
+                    <span>العربية</span>
+                </div>
+                <div class="language-option" data-lang="nl">
+                    <img src="https://flagcdn.com/w20/nl.png" class="language-flag">
+                    <span>Nederlands</span>
+                </div>
+                <div class="language-option" data-lang="it">
+                    <img src="https://flagcdn.com/w20/it.png" class="language-flag">
+                    <span>Italiano</span>
+                </div>
+                <div class="language-option" data-lang="hi">
+                    <img src="https://flagcdn.com/w20/in.png" class="language-flag">
+                    <span>हिन्दी</span>
+                </div>
+                <div class="language-option" data-lang="pl">
+                    <img src="https://flagcdn.com/w20/pl.png" class="language-flag">
+                    <span>Polski</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Grille de jeux -->
+            <div class="games-grid" id="games-grid">
+                <!-- Les jeux seront chargés ici dynamiquement -->
+                <div class="empty-state" id="empty-state">
+                    <h3>Aucun jeu disponible</h3>
+                    <p>Utilisez le code secret pour ajouter des jeux</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de publication -->
+    <div class="modal" id="publish-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">Publier un nouveau jeu</h2>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="publish-form">
+                    <div class="form-group">
+                        <label for="game-title" class="form-label" id="label-title">Titre du jeu</label>
+                        <input type="text" id="game-title" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="game-category" class="form-label" id="label-category">Catégorie</label>
+                        <select id="game-category" class="form-control" required>
+                            <option value="action" id="option-action">Action</option>
+                            <option value="adventure" id="option-adventure">Aventure</option>
+                            <option value="puzzle" id="option-puzzle">Puzzle</option>
+                            <option value="sports" id="option-sports">Sports</option>
+                            <option value="strategy" id="option-strategy">Stratégie</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="game-file" class="form-label" id="label-file">Fichier du jeu (HTML5)</label>
+                        <input type="file" id="game-file" class="form-control" accept=".html,.zip" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="game-thumbnail" class="form-label" id="label-thumbnail">Miniature</label>
+                        <input type="file" id="game-thumbnail" class="form-control" accept="image/*" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-block" id="publish-button">Publier</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vue du jeu -->
+    <div class="game-viewer" id="game-viewer">
+        <button class="close-game-btn" id="close-game-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        <iframe class="game-frame" id="game-frame"></iframe>
+    </div>
+
+    <!-- Panneau des paramètres -->
+    <div class="settings-panel" id="settings-panel">
+        <div class="settings-header">
+            <h2 class="settings-title">Paramètres et Statistiques</h2>
+            <button class="close-btn" id="close-settings">&times;</button>
+        </div>
+        <div class="settings-body">
+            <div class="settings-section">
+                <h3 class="section-title">Statistiques des jeux</h3>
+                <div class="table-responsive">
+                    <table class="stats-table" id="stats-table">
+                        <thead>
+                            <tr>
+                                <th>Jeu</th>
+                                <th>Vues</th>
+                                <th>Joué</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stats-body">
+                            <!-- Les statistiques seront chargées ici -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3 class="section-title">Historique des recherches</h3>
+                <ul class="search-history" id="search-history">
+                    <!-- L'historique sera chargé ici -->
+                </ul>
+            </div>
+            
+            <div class="settings-section">
+                <h3 class="section-title">Actions</h3>
+                <button class="btn btn-danger btn-block" id="clear-stats-btn">
+                    Réinitialiser les statistiques
+                </button>
+                <button class="btn btn-danger btn-block" id="clear-history-btn" style="margin-top: 0.5rem;">
+                    Effacer l'historique
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Traductions
+        const translations = {
+            en: {
+                searchPlaceholder: "Search games...",
+                currentLanguage: "EN",
+                modalTitle: "Publish a new game",
+                labelTitle: "Game title",
+                labelCategory: "Category",
+                optionAction: "Action",
+                optionAdventure: "Adventure",
+                optionPuzzle: "Puzzle",
+                optionSports: "Sports",
+                optionStrategy: "Strategy",
+                labelFile: "Game file (HTML5)",
+                labelThumbnail: "Thumbnail",
+                publishButton: "Publish",
+                gamePublished: "Game published successfully!",
+                noGamesFound: "No games available",
+                noGamesInstruction: "Use the secret code to add games",
+                settingsTitle: "Settings & Statistics",
+                statsTitle: "Game Statistics",
+                game: "Game",
+                views: "Views",
+                played: "Played",
+                actions: "Actions",
+                searchHistory: "Search History",
+                actionsTitle: "Actions",
+                clearStats: "Reset Statistics",
+                clearHistory: "Clear History",
+                delete: "Delete",
+                confirmDelete: "Are you sure you want to delete this game?",
+                noStats: "No statistics available",
+                noHistory: "No search history"
+            },
+            fr: {
+                searchPlaceholder: "Rechercher des jeux...",
+                currentLanguage: "FR",
+                modalTitle: "Publier un nouveau jeu",
+                labelTitle: "Titre du jeu",
+                labelCategory: "Catégorie",
+                optionAction: "Action",
+                optionAdventure: "Aventure",
+                optionPuzzle: "Puzzle",
+                optionSports: "Sports",
+                optionStrategy: "Stratégie",
+                labelFile: "Fichier du jeu (HTML5)",
+                labelThumbnail: "Miniature",
+                publishButton: "Publier",
+                gamePublished: "Jeu publié avec succès !",
+                noGamesFound: "Aucun jeu disponible",
+                noGamesInstruction: "Utilisez le code secret pour ajouter des jeux",
+                settingsTitle: "Paramètres et Statistiques",
+                statsTitle: "Statistiques des jeux",
+                game: "Jeu",
+                views: "Vues",
+                played: "Joué",
+                actions: "Actions",
+                searchHistory: "Historique des recherches",
+                actionsTitle: "Actions",
+                clearStats: "Réinitialiser les statistiques",
+                clearHistory: "Effacer l'historique",
+                delete: "Supprimer",
+                confirmDelete: "Êtes-vous sûr de vouloir supprimer ce jeu ?",
+                noStats: "Aucune statistique disponible",
+                noHistory: "Aucun historique de recherche"
+            },
+            es: {
+                searchPlaceholder: "Buscar juegos...",
+                currentLanguage: "ES",
+                modalTitle: "Publicar un nuevo juego",
+                labelTitle: "Título del juego",
+                labelCategory: "Categoría",
+                optionAction: "Acción",
+                optionAdventure: "Aventura",
+                optionPuzzle: "Puzzle",
+                optionSports: "Deportes",
+                optionStrategy: "Estrategia",
+                labelFile: "Archivo del juego (HTML5)",
+                labelThumbnail: "Miniatura",
+                publishButton: "Publicar",
+                gamePublished: "¡Juego publicado con éxito!",
+                noGamesFound: "No hay juegos disponibles",
+                noGamesInstruction: "Usa el código secreto para agregar juegos",
+                settingsTitle: "Configuración y Estadísticas",
+                statsTitle: "Estadísticas de juegos",
+                game: "Juego",
+                views: "Vistas",
+                played: "Jugado",
+                actions: "Acciones",
+                searchHistory: "Historial de búsqueda",
+                actionsTitle: "Acciones",
+                clearStats: "Restablecer estadísticas",
+                clearHistory: "Borrar historial",
+                delete: "Eliminar",
+                confirmDelete: "¿Estás seguro de que quieres eliminar este juego?",
+                noStats: "No hay estadísticas disponibles",
+                noHistory: "No hay historial de búsqueda"
+            },
+            ar: {
+                searchPlaceholder: "ابحث عن الألعاب...",
+                currentLanguage: "AR",
+                modalTitle: "نشر لعبة جديدة",
+                labelTitle: "عنوان اللعبة",
+                labelCategory: "الفئة",
+                optionAction: "أكشن",
+                optionAdventure: "مغامرة",
+                optionPuzzle: "لغز",
+                optionSports: "رياضة",
+                optionStrategy: "إستراتيجية",
+                labelFile: "ملف اللعبة (HTML5)",
+                labelThumbnail: "صورة مصغرة",
+                publishButton: "نشر",
+                gamePublished: "تم نشر اللعبة بنجاح!",
+                noGamesFound: "لا توجد ألعاب متاحة",
+                noGamesInstruction: "استخدم الكود السري لإضافة ألعاب",
+                settingsTitle: "الإعدادات والإحصائيات",
+                statsTitle: "إحصائيات الألعاب",
+                game: "اللعبة",
+                views: "المشاهدات",
+                played: "تم اللعب",
+                actions: "الإجراءات",
+                searchHistory: "سجل البحث",
+                actionsTitle: "الإجراءات",
+                clearStats: "إعادة تعيين الإحصائيات",
+                clearHistory: "مسح السجل",
+                delete: "حذف",
+                confirmDelete: "هل أنت متأكد أنك تريد حذف هذه اللعبة؟",
+                noStats: "لا توجد إحصائيات متاحة",
+                noHistory: "لا يوجد سجل بحث"
+            },
+            nl: {
+                searchPlaceholder: "Zoek spellen...",
+                currentLanguage: "NL",
+                modalTitle: "Publiceer een nieuw spel",
+                labelTitle: "Speltitel",
+                labelCategory: "Categorie",
+                optionAction: "Actie",
+                optionAdventure: "Avontuur",
+                optionPuzzle: "Puzzel",
+                optionSports: "Sport",
+                optionStrategy: "Strategie",
+                labelFile: "Spelbestand (HTML5)",
+                labelThumbnail: "Miniatuur",
+                publishButton: "Publiceren",
+                gamePublished: "Spel succesvol gepubliceerd!",
+                noGamesFound: "Geen spellen beschikbaar",
+                noGamesInstruction: "Gebruik de geheime code om spellen toe te voegen",
+                settingsTitle: "Instellingen & Statistieken",
+                statsTitle: "Spelstatistieken",
+                game: "Spel",
+                views: "Weergaven",
+                played: "Gespeeld",
+                actions: "Acties",
+                searchHistory: "Zoekgeschiedenis",
+                actionsTitle: "Acties",
+                clearStats: "Statistieken resetten",
+                clearHistory: "Geschiedenis wissen",
+                delete: "Verwijderen",
+                confirmDelete: "Weet je zeker dat je dit spel wilt verwijderen?",
+                noStats: "Geen statistieken beschikbaar",
+                noHistory: "Geen zoekgeschiedenis"
+            },
+            it: {
+                searchPlaceholder: "Cerca giochi...",
+                currentLanguage: "IT",
+                modalTitle: "Pubblica un nuovo gioco",
+                labelTitle: "Titolo del gioco",
+                labelCategory: "Categoria",
+                optionAction: "Azione",
+                optionAdventure: "Avventura",
+                optionPuzzle: "Puzzle",
+                optionSports: "Sport",
+                optionStrategy: "Strategia",
+                labelFile: "File del gioco (HTML5)",
+                labelThumbnail: "Miniatura",
+                publishButton: "Pubblica",
+                gamePublished: "Gioco pubblicato con successo!",
+                noGamesFound: "Nessun gioco disponibile",
+                noGamesInstruction: "Usa il codice segreto per aggiungere giochi",
+                settingsTitle: "Impostazioni & Statistiche",
+                statsTitle: "Statistiche dei giochi",
+                game: "Gioco",
+                views: "Visualizzazioni",
+                played: "Giocato",
+                actions: "Azioni",
+                searchHistory: "Cronologia ricerche",
+                actionsTitle: "Azioni",
+                clearStats: "Reimposta statistiche",
+                clearHistory: "Cancella cronologia",
+                delete: "Elimina",
+                confirmDelete: "Sei sicuro di voler eliminare questo gioco?",
+                noStats: "Nessuna statistica disponibile",
+                noHistory: "Nessuna cronologia ricerche"
+            },
+            hi: {
+                searchPlaceholder: "गेम खोजें...",
+                currentLanguage: "HI",
+                modalTitle: "एक नया गेम प्रकाशित करें",
+                labelTitle: "गेम का शीर्षक",
+                labelCategory: "श्रेणी",
+                optionAction: "एक्शन",
+                optionAdventure: "एडवेंचर",
+                optionPuzzle: "पहेली",
+                optionSports: "खेल",
+                optionStrategy: "रणनीति",
+                labelFile: "गेम फ़ाइल (HTML5)",
+                labelThumbnail: "थंबनेल",
+                publishButton: "प्रकाशित करें",
+                gamePublished: "गेम सफलतापूर्वक प्रकाशित हुआ!",
+                noGamesFound: "कोई गेम उपलब्ध नहीं",
+                noGamesInstruction: "गेम जोड़ने के लिए गुप्त कोड का उपयोग करें",
+                settingsTitle: "सेटिंग्स और आँकड़े",
+                statsTitle: "गेम आँकड़े",
+                game: "गेम",
+                views: "दृश्य",
+                played: "खेला गया",
+                actions: "कार्रवाई",
+                searchHistory: "खोज इतिहास",
+                actionsTitle: "कार्रवाई",
+                clearStats: "आँकड़े रीसेट करें",
+                clearHistory: "इतिहास साफ करें",
+                delete: "हटाएं",
+                confirmDelete: "क्या आप वाकई इस गेम को हटाना चाहते हैं?",
+                noStats: "कोई आँकड़े उपलब्ध नहीं",
+                noHistory: "कोई खोज इतिहास नहीं"
+            },
+            pl: {
+                searchPlaceholder: "Szukaj gier...",
+                currentLanguage: "PL",
+                modalTitle: "Opublikuj nową grę",
+                labelTitle: "Tytuł gry",
+                labelCategory: "Kategoria",
+                optionAction: "Akcja",
+                optionAdventure: "Przygoda",
+                optionPuzzle: "Puzzle",
+                optionSports: "Sport",
+                optionStrategy: "Strategia",
+                labelFile: "Plik gry (HTML5)",
+                labelThumbnail: "Miniatura",
+                publishButton: "Opublikuj",
+                gamePublished: "Gra opublikowana pomyślnie!",
+                noGamesFound: "Brak dostępnych gier",
+                noGamesInstruction: "Użyj tajnego kodu, aby dodać gry",
+                settingsTitle: "Ustawienia i Statystyki",
+                statsTitle: "Statystyki gier",
+                game: "Gra",
+                views: "Wyświetlenia",
+                played: "Rozegrane",
+                actions: "Akcje",
+                searchHistory: "Historia wyszukiwania",
+                actionsTitle: "Akcje",
+                clearStats: "Resetuj statystyki",
+                clearHistory: "Wyczyść historię",
+                delete: "Usuń",
+                confirmDelete: "Czy na pewno chcesz usunąć tę grę?",
+                noStats: "Brak statystyk",
+                noHistory: "Brak historii wyszukiwania"
+            }
+        };
+
+        // Données de l'application
+        let games = [];
+        let gameStats = {};
+        let searchHistory = [];
+        let currentLanguage = 'fr';
+
+        // Éléments du DOM
+        const searchBar = document.getElementById('search-bar');
+        const searchBtn = document.getElementById('search-btn');
+        const gamesGrid = document.getElementById('games-grid');
+        const emptyState = document.getElementById('empty-state');
+        const publishModal = document.getElementById('publish-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        const publishForm = document.getElementById('publish-form');
+        const gameViewer = document.getElementById('game-viewer');
+        const gameFrame = document.getElementById('game-frame');
+        const closeGameBtn = document.getElementById('close-game-btn');
+        const languageBtn = document.getElementById('language-btn');
+        const languageMenu = document.getElementById('language-menu');
+        const currentLanguageSpan = document.getElementById('current-language');
+        const settingsPanel = document.getElementById('settings-panel');
+        const closeSettingsBtn = document.getElementById('close-settings');
+        const statsTable = document.getElementById('stats-table');
+        const statsBody = document.getElementById('stats-body');
+        const searchHistoryList = document.getElementById('search-history');
+        const clearStatsBtn = document.getElementById('clear-stats-btn');
+        const clearHistoryBtn = document.getElementById('clear-history-btn');
+
+        // Charger les traductions
+        function loadTranslations(lang) {
+            currentLanguage = lang;
+            const t = translations[lang];
+            
+            // Mettre à jour les textes
+            currentLanguageSpan.textContent = t.currentLanguage;
+            searchBar.placeholder = t.searchPlaceholder;
+            document.getElementById('modal-title').textContent = t.modalTitle;
+            document.getElementById('label-title').textContent = t.labelTitle;
+            document.getElementById('label-category').textContent = t.labelCategory;
+            document.getElementById('option-action').textContent = t.optionAction;
+            document.getElementById('option-adventure').textContent = t.optionAdventure;
+            document.getElementById('option-puzzle').textContent = t.optionPuzzle;
+            document.getElementById('option-sports').textContent = t.optionSports;
+            document.getElementById('option-strategy').textContent = t.optionStrategy;
+            document.getElementById('label-file').textContent = t.labelFile;
+            document.getElementById('label-thumbnail').textContent = t.labelThumbnail;
+            document.getElementById('publish-button').textContent = t.publishButton;
+            document.querySelector('.settings-title').textContent = t.settingsTitle;
+            document.querySelectorAll('.section-title')[0].textContent = t.statsTitle;
+            document.querySelectorAll('.section-title')[1].textContent = t.searchHistory;
+            document.querySelectorAll('.section-title')[2].textContent = t.actionsTitle;
+            clearStatsBtn.textContent = t.clearStats;
+            clearHistoryBtn.textContent = t.clearHistory;
+            emptyState.querySelector('h3').textContent = t.noGamesFound;
+            emptyState.querySelector('p').textContent = t.noGamesInstruction;
+            
+            // Mettre à jour les en-têtes du tableau
+            if (statsTable) {
+                statsTable.querySelector('thead tr th:nth-child(1)').textContent = t.game;
+                statsTable.querySelector('thead tr th:nth-child(2)').textContent = t.views;
+                statsTable.querySelector('thead tr th:nth-child(3)').textContent = t.played;
+                statsTable.querySelector('thead tr th:nth-child(4)').textContent = t.actions;
+            }
+            
+            // Sauvegarder la langue
+            localStorage.setItem('miki-language', lang);
+            loadGames();
+            loadStats();
+            loadSearchHistory();
+        }
+
+        // Charger les jeux
+        function loadGames() {
+            gamesGrid.innerHTML = '';
+            
+            if (games.length === 0) {
+                gamesGrid.appendChild(emptyState);
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            games.forEach((game, index) => {
+                const gameCard = document.createElement('div');
+                gameCard.className = 'game-card';
+                gameCard.style.animationDelay = `${index * 0.1}s`;
+                
+                gameCard.innerHTML = `
+                    <div class="game-thumbnail">${game.title}</div>
+                    <div class="game-info">
+                        <h3 class="game-title">${game.title}</h3>
+                        <span class="game-category">${game.category}</span>
+                        <div class="game-stats">
+                            <span>Vues: ${gameStats[game.id]?.views || 0}</span>
+                            <span>Joué: ${gameStats[game.id]?.played || 0}</span>
+                        </div>
+                    </div>
+                `;
+                
+                gameCard.addEventListener('click', () => {
+                    playGame(game.file);
+                    // Mettre à jour les statistiques
+                    if (!gameStats[game.id]) {
+                        gameStats[game.id] = { views: 0, played: 0 };
+                    }
+                    gameStats[game.id].views++;
+                    gameStats[game.id].played++;
+                    saveStats();
+                    loadStats();
+                });
+                
+                gamesGrid.appendChild(gameCard);
+            });
+        }
+
+        // Jouer un jeu
+        function playGame(gameFile) {
+            gameFrame.src = gameFile;
+            gameViewer.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Fermer le jeu
+        function closeGame() {
+            gameViewer.classList.remove('show');
+            gameFrame.src = '';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Charger les statistiques
+        function loadStats() {
+            statsBody.innerHTML = '';
+            
+            if (Object.keys(gameStats).length === 0) {
+                statsBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 1rem; color: var(--dark-light);">
+                            ${translations[currentLanguage].noStats}
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            games.forEach(game => {
+                if (gameStats[game.id]) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${game.title}</td>
+                        <td>${gameStats[game.id].views}</td>
+                        <td>${gameStats[game.id].played}</td>
+                        <td>
+                            <button class="btn btn-danger" data-id="${game.id}" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                ${translations[currentLanguage].delete}
+                            </button>
+                        </td>
+                    `;
+                    statsBody.appendChild(row);
+                }
+            });
+            
+            // Ajouter des écouteurs pour les boutons de suppression
+            document.querySelectorAll('#stats-body .btn-danger').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const gameId = e.target.getAttribute('data-id');
+                    if (confirm(translations[currentLanguage].confirmDelete)) {
+                        deleteGame(gameId);
+                    }
+                });
+            });
+        }
+
+        // Supprimer un jeu
+        function deleteGame(gameId) {
+            games = games.filter(game => game.id.toString() !== gameId);
+            delete gameStats[gameId];
+            saveGames();
+            saveStats();
+            loadGames();
+            loadStats();
+        }
+
+        // Charger l'historique des recherches
+        function loadSearchHistory() {
+            searchHistoryList.innerHTML = '';
+            
+            if (searchHistory.length === 0) {
+                searchHistoryList.innerHTML = `
+                    <div style="text-align: center; padding: 1rem; color: var(--dark-light);">
+                        ${translations[currentLanguage].noHistory}
+                    </div>
+                `;
+                return;
+            }
+            
+            searchHistory.forEach((search, index) => {
+                const item = document.createElement('li');
+                item.className = 'search-item';
+                item.innerHTML = `
+                    <span>${search.term}</span>
+                    <span>${new Date(search.timestamp).toLocaleString()}</span>
+                `;
+                searchHistoryList.appendChild(item);
+            });
+        }
+
+        // Sauvegarder les jeux
+        function saveGames() {
+            localStorage.setItem('miki-games', JSON.stringify(games));
+        }
+
+        // Charger les jeux sauvegardés
+        function loadSavedGames() {
+            const savedGames = localStorage.getItem('miki-games');
+            if (savedGames) {
+                games = JSON.parse(savedGames);
+            }
+        }
+
+        // Sauvegarder les statistiques
+        function saveStats() {
+            localStorage.setItem('miki-stats', JSON.stringify(gameStats));
+        }
+
+        // Charger les statistiques sauvegardées
+        function loadSavedStats() {
+            const savedStats = localStorage.getItem('miki-stats');
+            if (savedStats) {
+                gameStats = JSON.parse(savedStats);
+            }
+        }
+
+        // Sauvegarder l'historique des recherches
+        function saveSearchHistory() {
+            localStorage.setItem('miki-search-history', JSON.stringify(searchHistory));
+        }
+
+        // Charger l'historique des recherches sauvegardé
+        function loadSavedSearchHistory() {
+            const savedHistory = localStorage.getItem('miki-search-history');
+            if (savedHistory) {
+                searchHistory = JSON.parse(savedHistory);
+            }
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            // Charger les données sauvegardées
+            loadSavedGames();
+            loadSavedStats();
+            loadSavedSearchHistory();
+            
+            // Charger la langue sauvegardée ou la langue par défaut
+            const savedLanguage = localStorage.getItem('miki-language') || 'fr';
+            loadTranslations(savedLanguage);
+            
+            // Gérer la recherche
+            searchBtn.addEventListener('click', handleSearch);
+            searchBar.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleSearch();
+                }
+            });
+            
+            function handleSearch() {
+                const searchTerm = searchBar.value.trim().toLowerCase();
+                
+                // Codes secrets
+                if (searchTerm === 'dao.xea22') {
+                    publishModal.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                    searchBar.value = '';
+                    return;
+                }
+                
+                if (searchTerm === 'adamax') {
+                    settingsPanel.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                    searchBar.value = '';
+                    return;
+                }
+                
+                // Recherche normale
+                if (searchTerm) {
+                    // Ajouter à l'historique
+                    searchHistory.unshift({
+                        term: searchTerm,
+                        timestamp: Date.now()
+                    });
+                    saveSearchHistory();
+                    loadSearchHistory();
+                    
+                    const filteredGames = games.filter(game => 
+                        game.title.toLowerCase().includes(searchTerm) || 
+                        game.category.toLowerCase().includes(searchTerm)
+                    );
+                    
+                    if (filteredGames.length > 0) {
+                        games = filteredGames;
+                        loadGames();
+                    } else {
+                        alert(translations[currentLanguage].noGamesFound);
+                    }
+                } else {
+                    // Si la recherche est vide, recharger tous les jeux
+                    loadSavedGames();
+                    loadGames();
+                }
+            }
+            
+            // Gérer la publication de jeux
+            publishForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const title = document.getElementById('game-title').value;
+                const category = document.getElementById('game-category').value;
+                const gameFile = document.getElementById('game-file').files[0];
+                const thumbnailFile = document.getElementById('game-thumbnail').files[0];
+                
+                if (title && category && gameFile && thumbnailFile) {
+                    // Générer un ID unique
+                    const newId = games.length > 0 ? Math.max(...games.map(g => g.id)) + 1 : 1;
+                    
+                    // Créer des URLs pour les fichiers
+                    const gameUrl = URL.createObjectURL(gameFile);
+                    const thumbnailUrl = URL.createObjectURL(thumbnailFile);
+                    
+                    // Ajouter le nouveau jeu
+                    const newGame = {
+                        id: newId,
+                        title,
+                        category,
+                        thumbnail: thumbnailUrl,
+                        file: gameUrl
+                    };
+                    
+                    games.push(newGame);
+                    saveGames();
+                    loadGames();
+                    
+                    // Réinitialiser le formulaire
+                    publishForm.reset();
+                    publishModal.classList.remove('show');
+                    document.body.style.overflow = 'auto';
+                    
+                    alert(translations[currentLanguage].gamePublished);
+                }
+            });
+            
+            // Fermer le modal
+            closeModalBtn.addEventListener('click', () => {
+                publishModal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            });
+            
+            // Fermer la vue du jeu
+            closeGameBtn.addEventListener('click', closeGame);
+            
+            // Gérer le menu des langues
+            languageBtn.addEventListener('click', () => {
+                languageMenu.classList.toggle('show');
+            });
+            
+            // Sélectionner une langue
+            document.querySelectorAll('.language-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const lang = option.getAttribute('data-lang');
+                    loadTranslations(lang);
+                    languageMenu.classList.remove('show');
+                });
+            });
+            
+            // Fermer le menu des langues en cliquant ailleurs
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.language-selector')) {
+                    languageMenu.classList.remove('show');
+                }
+            });
+            
+            // Fermer le panneau des paramètres
+            closeSettingsBtn.addEventListener('click', () => {
+                settingsPanel.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            });
+            
+            // Réinitialiser les statistiques
+            clearStatsBtn.addEventListener('click', () => {
+                if (confirm(translations[currentLanguage].confirmDelete)) {
+                    gameStats = {};
+                    saveStats();
+                    loadStats();
+                }
+            });
+            
+            // Effacer l'historique
+            clearHistoryBtn.addEventListener('click', () => {
+                if (confirm(translations[currentLanguage].confirmDelete)) {
+                    searchHistory = [];
+                    saveSearchHistory();
+                    loadSearchHistory();
+                }
+            });
+            
+            // Charger les données initiales
+            loadGames();
+            loadStats();
+            loadSearchHistory();
+        });
+    </script>
+</body>
+</html>
